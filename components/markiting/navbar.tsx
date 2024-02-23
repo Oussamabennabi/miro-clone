@@ -4,6 +4,7 @@ import Logo from "../ui/logo";
 import { NavigationMenuLinks } from "./navbar-links";
 import { Button } from "../ui/button";
 import { ToggleThemeButton } from "../ui/toggle-theme";
+import Link from "next/link";
 
 const Navbar = () => {
   return (
@@ -14,6 +15,9 @@ const Navbar = () => {
       </div>
       <div className="flex justify-center items-center gap-2">
         <Button size={"sm"}>Sign in</Button>
+        <Link href={"/dashboard"}>
+          <Button size={"sm"}>Dashboard</Button>
+        </Link>
         <UserButton />
         <ToggleThemeButton />
       </div>

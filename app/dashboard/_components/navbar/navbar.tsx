@@ -1,18 +1,20 @@
 "use client";
 import React from "react";
 import { UserButton } from "@clerk/nextjs";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { ToggleThemeButton } from "@/components/ui/toggle-theme";
+import SearchInput from "./search-input";
+import CustomeOrgSwitcher from "@/components/custom-org-switcher";
 
 const Navbar = () => {
   return (
-    <nav className="p-1 px-3  dark:shadow-neutral-800  flex justify-between items-center shadow-md">
-      <div className="flex items-center justify-center gap-4">
-        <Input type="search" placeholder="Search here..." />
+    <nav className="p-1 px-3 dark:shadow-neutral-800 gap-4 flex justify-between items-center shadow-md">
+      <div className="md:flex w-full hidden ">
+      <SearchInput />
       </div>
-      <div className="flex justify-center items-center gap-2">
-        <Button size={"sm"}>Sign in</Button>
+      <div className="flex md:w-fit w-full justify-end items-center gap-2">
+        <div className="flex w-full lg:hidden">
+          <CustomeOrgSwitcher width="100%" />
+        </div>
         <UserButton />
         <ToggleThemeButton />
       </div>
