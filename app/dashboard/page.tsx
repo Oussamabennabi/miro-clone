@@ -1,39 +1,24 @@
-import TemplateCard from "@/app/dashboard/_components/template-card";
-import { H2, Small } from "@/components/ui/typography";
-import Link from "next/link";
-const Page = () => {
+"use client";
+
+import BoardList from "./_components/boards/board-list";
+import EmptyOrg from "./_components/boards/empty-org";
+import { useOrganization } from "@clerk/nextjs";
+import TemplateCards from "./_components/template-cards";
+
+interface PageProps {
+  searchParams: {
+    search?: string;
+    favorites?: string;
+  };
+}
+
+const Page = ({ searchParams }: PageProps) => {
+  const { organization } = useOrganization();
   return (
-    <main className="p-4 space-y-5">
-      <H2>Create a board</H2>
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-between items-center">
-          <Small>Recommended Templates</Small>
-          <Small><Link href={''} className="hover:underline">See All</Link></Small>
-        </div>
-        <div className="flex flex-wrap justify-start items-center gap-5">
-          <TemplateCard
-            img="/markiting/landing-page-cover.svg"
-            title="New Board"
-          />
-          <TemplateCard
-            img="/markiting/landing-page-cover.svg"
-            title="Mini Map"
-          />
-          <TemplateCard
-            img="/markiting/landing-page-cover.svg"
-            title="Kanban Framework"
-          />
-          <TemplateCard
-            img="/markiting/landing-page-cover.svg"
-            title="Notes"
-          />
-          <TemplateCard
-            img="/markiting/landing-page-cover.svg"
-            title="Customer"
-          />
-         
-        </div>
-      </div>
+    <main className="p-4 space-y-5 h-full flex-col flex justify-center items-str\">
+      {organization && <TemplateCards />}
+
+      {!organization ? <EmptyOrg /> : <BoardList query={searchParams} />}
     </main>
   );
 };
