@@ -20,7 +20,7 @@ const Page = ({ searchParams }: PageProps) => {
       {organization && <TemplateCards />}
       {organization && <BoardListHeader />}
 
-      {!organization ? <EmptyOrg /> : <BoardList query={searchParams} />}
+      {!organization ? <EmptyOrg /> : <BoardList orgId={organization.id} query={searchParams} />}
     </main>
   );
 };

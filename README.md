@@ -1,0 +1,1 @@
+-[] revert to npx shadcn-ui@latest add alert-dialog

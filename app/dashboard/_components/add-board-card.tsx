@@ -5,17 +5,21 @@ import { api } from "@/convex/_generated/api";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 import { useOrganization } from "@clerk/nextjs";
 import { Loader2, Plus } from "lucide-react";
+import {  useRouter } from "next/navigation";
 import React from "react";
 
 const AddBoardCard = () => {
   const { loading, mutate } = useApiMutation(api.board.createBoard);
   const { organization } = useOrganization();
+  const router = useRouter()
   const handleCreate = async () => {
-    await mutate({
+    const id =await mutate({
       description: "board description",
       orgId: organization?.id!,
-      title: "Board 1",
+      title: "Untitled",
     });
+    router.push("/board/"+id)
+
   };
   return (
     <div

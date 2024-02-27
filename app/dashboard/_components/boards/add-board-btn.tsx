@@ -1,3 +1,5 @@
+"use client";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { useApiMutation } from "@/hooks/use-api-mutation";
@@ -8,12 +10,14 @@ import React from "react";
 const AddBoardButton = () => {
   const { loading, mutate } = useApiMutation(api.board.createBoard);
   const { organization } = useOrganization();
-  const handleCreate = () => {
-    mutate({
+  const router = useRouter();
+  const handleCreate = async () => {
+    const id = await mutate({
       description: "board description",
       orgId: organization?.id!,
-      title: "Board 1",
+      title: "Untitled",
     });
+    router.push("/board/" + id);
   };
   return (
     <Button

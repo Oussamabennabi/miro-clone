@@ -1,8 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { H4, Small } from "@/components/ui/typography";
+import { H4, P, PMuted, Small } from "@/components/ui/typography";
 import { DataModel } from "@/convex/_generated/dataModel";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Star } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { BoardCardMenuItems } from "./board-card-menu-items";
@@ -11,16 +11,38 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Hint } from "@/components/ui/hint";
+import { useRouter } from "next/navigation";
+import { formatDistance, formatDistanceToNow } from "date-fns";
+import { useAuth } from "@clerk/nextjs";
 interface BoardCardProps {
   board: DataModel["boards"]["document"];
 }
 export const BoardCard = ({ board }: BoardCardProps) => {
+  const router = useRouter();
+  function handleClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    router.push("/board/" + board._id);
+  }
+
+  const { userId } = useAuth();
+
+  const isMeLabel = userId === board.authorId ? "You " : board.authorName;
+
+  const createdAtLabel = formatDistanceToNow(board._creationTime, {
+    addSuffix: true,
+  });
+
   return (
-    <div className="flex group/card cursor-pointer flex-col overflow-hidden  hover:shadow-md shadow-primary/40 transition-all border border-primary/10  rounded-md justify-start gap-2 items-start w-[200px] h-[280px] ">
-      <div className="relative dark:bg-neutral-900/60 bg-neutral-100 group">
+    <div 
+    
+    onClick={handleClick}
+    className="flex group/card cursor-pointer flex-col relative overflow-hidden  hover:shadow-md shadow-primary/40 transition-all border border-primary/10  rounded-md justify-start gap-2 items-start w-[200px] h-[270px] ">
+      <div className="relative bg-primary/10 group">
         {/* overlay */}
 
-        <div className=" absolute p-1.5 flex items-start justify-end  inset-0 w-full opacity-0 transition-all group-hover:opacity-100 bg-black/40 h-full">
+        <div className=" absolute p-1.5 z-20 flex items-start justify-end  inset-0 w-full opacity-0 transition-all group-hover:opacity-100 bg-black/40 h-full">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -35,27 +57,38 @@ export const BoardCard = ({ board }: BoardCardProps) => {
             <BoardCardMenuItems board={board} />
           </DropdownMenu>
         </div>
+
+      
+      
         <Image
           alt={board.imageUrl}
           src={board.imageUrl}
           width={200}
           height={300}
-          className="h-[210px]"
+          className="h-[200px] object-cover"
         />
       </div>
-      <div className="flex flex-col gap-1.5 items-start justify-start p-1">
-        <H4>
-          <Hint label={board.title}>
-            <span className="truncate block max-h-12 max-w-[190px]">
-              {board.title}
+      <div
+        className="flex w-full flex-col gap-1 items-start justify-start p-1"
+      >
+        <P>
+          <div className="w-full flex justify-between items-center">
+          <Star className="!text-yellow-500 mr-2 !fill-yellow-500 h-5 w-5 " />
+
+            <Hint label={board.title}>
+              <span className="truncate block max-h-12 max-w-[170px]">
+                {board.title}
+              </span>
+            </Hint>
+          </div>
+        </P>
+        <PMuted>
+          <Small>
+            <span className="group-hover/card:opacity-100 block opacity-0 transition-all">
+              {isMeLabel + ", " + createdAtLabel}
             </span>
-          </Hint>
-        </H4>
-        <Small>
-          <span className="group-hover/card:visible invisible  transition-all truncate block max-h-12 max-w-[190px]">
-            {board.description}
-          </span>
-        </Small>
+          </Small>
+        </PMuted>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import { api } from "@/convex/_generated/api";
 import { DataModel } from "@/convex/_generated/dataModel";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 import {
+  Copy,
   GalleryHorizontalEnd,
   Image as ImageIcon,
   Pen,
@@ -20,6 +21,7 @@ import {
   Trash,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 interface BoardCardMenuItemsProps {
   board: DataModel["boards"]["document"];
 }
@@ -28,22 +30,43 @@ export function BoardCardMenuItems({ board }: BoardCardMenuItemsProps) {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [changeThumbnailModalOpen, setChangeThumbnailModalOpen] =
     useState(false);
+
   const [renameBoardModalOpen, setRenameBoardModalOpen] = useState(false);
   const handleDuplicate = async () => {
     // todo ... author, authorId
     await mutate({
       description: board.description,
       orgId: board.orgId,
-      title: board.title+"(Duplicate)",
+      title: board.title + "(Duplicate)",
       imageUrl: board.imageUrl,
     });
-    
+  };
+
+  const handleCopyUrl = async () => {
+    await navigator.clipboard.writeText(
+      `${window.location.origin}/board/${board._id}`
+    );
+    toast.success("Successfully copied url.");
   };
   return (
     <>
-      <DropdownMenuContent side="right" className="w-56">
+      <DropdownMenuContent
+        onClick={(e) => e.stopPropagation()}
+        side="right"
+        className="w-56"
+      >
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
+
+        <DropdownMenuGroup>
+          <DropdownMenuItem onClick={handleCopyUrl}>
+            <Copy className="w-4 h-4 mr-2" />
+            Copy Url
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+
         <DropdownMenuGroup>
           <DropdownMenuItem className="hover:!bg-yellow-500 group hover:!text-white">
             <Star className="w-4 h-4 mr-2 text-yellow-500 group-hover:!text-white" />
@@ -72,31 +95,33 @@ export function BoardCardMenuItems({ board }: BoardCardMenuItemsProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
       {/* modals */}
-      <DeleteBoardModal
-        board={{
-          id: board._id,
-          title: board.title,
-        }}
-        open={deleteModalOpen}
-        setOpen={setDeleteModalOpen}
-      />
+      <div onClick={(e) => e.stopPropagation()}>
+        <DeleteBoardModal
+          board={{
+            id: board._id,
+            title: board.title,
+          }}
+          open={deleteModalOpen}
+          setOpen={setDeleteModalOpen}
+        />
 
-      <ChangeBoardThumbnailModal
-        board={{
-          id: board._id,
-          title: board.title,
-        }}
-        open={changeThumbnailModalOpen}
-        setOpen={setChangeThumbnailModalOpen}
-      />
-      <RenameBoardModal
-        board={{
-          id: board._id,
-          title: board.title,
-        }}
-        open={renameBoardModalOpen}
-        setOpen={setRenameBoardModalOpen}
-      />
+        <ChangeBoardThumbnailModal
+          board={{
+            id: board._id,
+            title: board.title,
+          }}
+          open={changeThumbnailModalOpen}
+          setOpen={setChangeThumbnailModalOpen}
+        />
+        <RenameBoardModal
+          board={{
+            id: board._id,
+            title: board.title,
+          }}
+          open={renameBoardModalOpen}
+          setOpen={setRenameBoardModalOpen}
+        />
+      </div>
     </>
   );
 }

@@ -20,7 +20,6 @@ export const createBoard = mutation({
             throw new Error("You are not authorized!");
         }
         const imageUrl = args.imageUrl ?? BOARDS_IMAGES[Math.round(Math.random() * BOARDS_IMAGES.length)]
-        console.log("ImsgeIts? ",imageUrl)
         const newBoardId = await ctx.db.insert("boards", {
             ...args,
             imageUrl,
@@ -36,9 +35,16 @@ export const createBoard = mutation({
 
 
 export const getBoards = query({
-    handler: async (ctx) => {
+    args: {
+        id: v.string()
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.auth.getUserIdentity()
+        if (!user) {
+            throw new Error("You are not authorized!");
+        }
         const boards = await ctx.db
-            .query("boards")
+            .query("boards").withIndex("bg_org", q => q.eq("orgId", args.id))
             .order("desc").collect()
         return boards;
     },
@@ -47,10 +53,15 @@ export const getBoards = query({
 
 
 export const deleteBoard = mutation({
+
     args: {
         id: v.id("boards"),
     },
     handler: async (ctx, args) => {
+        const user = await ctx.auth.getUserIdentity()
+        if (!user) {
+            throw new Error("You are not authorized!");
+        }
         await ctx.db.delete(args.id)
     },
 });
@@ -66,6 +77,10 @@ export const updateBoard = mutation({
         imageUrl: v.optional(v.string())
     },
     handler: async (ctx, args) => {
+        const user = await ctx.auth.getUserIdentity()
+        if (!user) {
+            throw new Error("You are not authorized!");
+        }
         const { id } = args;
         const exists = await ctx.db.get(id);
         if (!exists) throw new Error("There is no board with id: " + id)
