@@ -10,8 +10,8 @@ import React from "react";
 const AddBoardCard = () => {
   const { loading, mutate } = useApiMutation(api.board.createBoard);
   const { organization } = useOrganization();
-  const handleCreate = () => {
-    mutate({
+  const handleCreate = async () => {
+    await mutate({
       description: "board description",
       orgId: organization?.id!,
       title: "Board 1",
@@ -23,17 +23,12 @@ const AddBoardCard = () => {
       className="group cursor-pointer focus-within:outline-none flex justify-center flex-col items-center gap-2"
     >
       <Button
-      disabled={loading}
-
-      onClick={handleCreate}
+        disabled={loading}
+        onClick={handleCreate}
         className="p-1 w-[122px] h-[87px] rounded-md group-hover:ring-2 group-focus-visible:ring-2 ring-primary transition-all"
         size={"icon"}
       >
-      {loading ? <Loader2 className="h-4 w-4 animate-spin" />:
-        <Plus />
-      
-      }
-
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus />}
       </Button>
       <Small>Add a new board</Small>
     </div>

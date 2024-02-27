@@ -19,7 +19,6 @@ const CustomeOrgSwitcher = ({ width }: CustomeOrgSwitcherProps) => {
           organizationSwitcherTrigger: {
             width,
             justifyContent: "space-between",
-            border: "1px solid #e5e7eb",
           },
         },
       }}

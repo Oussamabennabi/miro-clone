@@ -12,11 +12,11 @@ const ProjectsSidebar = () => {
   const searchParams = useSearchParams();
   const favorites = searchParams.get("favorites");
   return (
-    <aside className="h-full lg:flex hidden shadow-lg  flex-col gap-3 items-start justify-start border-r-2 p-2 w-72 ">
+    <aside className="h-full lg:flex hidden shadow-lg  flex-col gap-3 items-start justify-start border-r-2 p-2 w-60 ">
       <Logo />
       <Separator />
       <div>
-        <CustomeOrgSwitcher width="275px" />
+        <CustomeOrgSwitcher width="220px" />
       </div>
       {/*  */}
       <Button

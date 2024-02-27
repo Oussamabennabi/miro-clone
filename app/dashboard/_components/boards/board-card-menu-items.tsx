@@ -1,68 +1,102 @@
 "use client";
+import ChangeBoardThumbnailModal from "@/components/modals/change-board-thumbnail";
+import DeleteBoardModal from "@/components/modals/delete-board";
+import RenameBoardModal from "@/components/modals/rename-board";
 import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
-
-export function BoardCardMenuItems() {
+import { api } from "@/convex/_generated/api";
+import { DataModel } from "@/convex/_generated/dataModel";
+import { useApiMutation } from "@/hooks/use-api-mutation";
+import {
+  GalleryHorizontalEnd,
+  Image as ImageIcon,
+  Pen,
+  Star,
+  Trash,
+} from "lucide-react";
+import { useState } from "react";
+interface BoardCardMenuItemsProps {
+  board: DataModel["boards"]["document"];
+}
+export function BoardCardMenuItems({ board }: BoardCardMenuItemsProps) {
+  const { mutate, loading } = useApiMutation(api.board.createBoard);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [changeThumbnailModalOpen, setChangeThumbnailModalOpen] =
+    useState(false);
+  const [renameBoardModalOpen, setRenameBoardModalOpen] = useState(false);
+  const handleDuplicate = async () => {
+    // todo ... author, authorId
+    await mutate({
+      description: board.description,
+      orgId: board.orgId,
+      title: board.title+"(Duplicate)",
+      imageUrl: board.imageUrl,
+    });
+    
+  };
   return (
-    <DropdownMenuContent side="right" className="w-56">
-      <DropdownMenuLabel>My Account</DropdownMenuLabel>
-      <DropdownMenuSeparator />
-      <DropdownMenuGroup>
-        <DropdownMenuItem>
-          Profile
-          <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+    <>
+      <DropdownMenuContent side="right" className="w-56">
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem className="hover:!bg-yellow-500 group hover:!text-white">
+            <Star className="w-4 h-4 mr-2 text-yellow-500 group-hover:!text-white" />
+            Mark Favorite
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleDuplicate}>
+            <GalleryHorizontalEnd className="w-4 h-4 mr-2" />
+            Duplicate
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setRenameBoardModalOpen(true)}>
+            <Pen className="w-4 h-4 mr-2" />
+            Rename
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setChangeThumbnailModalOpen(true)}>
+            <ImageIcon className="w-4 h-4 mr-2" />
+            Change Thumbnail
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => setDeleteModalOpen(true)}
+          className="hover:!bg-red-500 group hover:!text-white"
+        >
+          <Trash className="w-4 h-4 mr-2 text-red-500 group-hover:!text-white" />
+          Delete
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          Billing
-          <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          Settings
-          <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          Keyboard shortcuts
-          <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-        </DropdownMenuItem>
-      </DropdownMenuGroup>
-      <DropdownMenuSeparator />
-      <DropdownMenuGroup>
-        <DropdownMenuItem>Team</DropdownMenuItem>
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuSubContent>
-              <DropdownMenuItem>Email</DropdownMenuItem>
-              <DropdownMenuItem>Message</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>More...</DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuPortal>
-        </DropdownMenuSub>
-        <DropdownMenuItem>
-          New Team
-          <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-        </DropdownMenuItem>
-      </DropdownMenuGroup>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem>GitHub</DropdownMenuItem>
-      <DropdownMenuItem>Support</DropdownMenuItem>
-      <DropdownMenuItem disabled>API</DropdownMenuItem>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem>
-        Log out
-        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-      </DropdownMenuItem>
-    </DropdownMenuContent>
+      </DropdownMenuContent>
+      {/* modals */}
+      <DeleteBoardModal
+        board={{
+          id: board._id,
+          title: board.title,
+        }}
+        open={deleteModalOpen}
+        setOpen={setDeleteModalOpen}
+      />
+
+      <ChangeBoardThumbnailModal
+        board={{
+          id: board._id,
+          title: board.title,
+        }}
+        open={changeThumbnailModalOpen}
+        setOpen={setChangeThumbnailModalOpen}
+      />
+      <RenameBoardModal
+        board={{
+          id: board._id,
+          title: board.title,
+        }}
+        open={renameBoardModalOpen}
+        setOpen={setRenameBoardModalOpen}
+      />
+    </>
   );
 }

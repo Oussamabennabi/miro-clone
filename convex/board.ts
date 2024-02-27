@@ -1,18 +1,9 @@
+import { BOARDS_IMAGES } from "@/lib/constants";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-const images = [
-    "/placeholders/1.svg",
-    "/placeholders/2.svg",
-    "/placeholders/3.svg",
-    "/placeholders/4.svg",
-    "/placeholders/5.svg",
-    "/placeholders/6.svg",
-    "/placeholders/7.svg",
-    "/placeholders/8.svg",
-    "/placeholders/9.svg",
-    "/placeholders/10.svg",
-]
+
+
 
 // Create a new task with the given text
 export const createBoard = mutation({
@@ -20,6 +11,7 @@ export const createBoard = mutation({
         title: v.string(),
         orgId: v.string(),
         description: v.string(),
+        imageUrl: v.optional(v.string()),
     },
 
     handler: async (ctx, args) => {
@@ -27,7 +19,8 @@ export const createBoard = mutation({
         if (!user) {
             throw new Error("You are not authorized!");
         }
-        const imageUrl = images[Math.round(Math.random() * images.length)]
+        const imageUrl = args.imageUrl ?? BOARDS_IMAGES[Math.round(Math.random() * BOARDS_IMAGES.length)]
+        console.log("ImsgeIts? ",imageUrl)
         const newBoardId = await ctx.db.insert("boards", {
             ...args,
             imageUrl,
@@ -39,11 +32,59 @@ export const createBoard = mutation({
     },
 });
 
+
+
+
 export const getBoards = query({
     handler: async (ctx) => {
         const boards = await ctx.db
             .query("boards")
             .order("desc").collect()
         return boards;
+    },
+});
+
+
+
+export const deleteBoard = mutation({
+    args: {
+        id: v.id("boards"),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.delete(args.id)
+    },
+});
+
+
+
+export const updateBoard = mutation({
+    args: {
+        id: v.id("boards"),
+
+        title: v.optional(v.string()),
+        description: v.optional(v.string()),
+        imageUrl: v.optional(v.string())
+    },
+    handler: async (ctx, args) => {
+        const { id } = args;
+        const exists = await ctx.db.get(id);
+        if (!exists) throw new Error("There is no board with id: " + id)
+
+        if (args.imageUrl)
+            await ctx.db.patch(id, {
+                imageUrl: args.imageUrl,
+            })
+
+        if (args.title)
+            await ctx.db.patch(id, {
+                title: args.title,
+            })
+
+        if (args.description)
+            await ctx.db.patch(id, {
+                description: args.description,
+            })
+
+
     },
 });

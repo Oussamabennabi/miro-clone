@@ -1,8 +1,13 @@
+import failedToast from "@/components/toasts/failed-toast";
+import succesToast from "@/components/toasts/succes-toast";
 import { useMutation } from "convex/react";
 import { FunctionReference } from "convex/server";
 import { useState } from "react";
 
-export const useApiMutation = <T extends FunctionReference<"mutation">>(fnc: T) => {
+
+export const useApiMutation = <T extends FunctionReference<"mutation">>(
+  fnc: T
+) => {
   const [loading, setLoading] = useState(false);
   const apiMutate = useMutation<T>(fnc);
 
@@ -10,8 +15,12 @@ export const useApiMutation = <T extends FunctionReference<"mutation">>(fnc: T) 
     setLoading(true);
 
     return apiMutate(payload)
-      .then((res) => res)
+      .then((res) => {
+        succesToast();
+        return res;
+      })
       .catch((err) => {
+        failedToast();
         throw err;
       })
       .finally(() => setLoading(false));
