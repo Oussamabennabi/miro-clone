@@ -1,19 +1,19 @@
 import { createClient } from "@liveblocks/client";
 import { createRoomContext, createLiveblocksContext } from "@liveblocks/react";
-  
+
 const client = createClient({
-  publicApiKey: "pk_dev_OM4NdV_o5LNHLl6JLLiftRAPYLOpGjKyj6HkyjaB_qwcoRzF4eOeF9ChRv9TO3YG",
+  authEndpoint: "/api/liveblocks-auth",
   async resolveUsers({ userIds }) {
     // Used only for Comments and Notifications. Return a list of user information
     // retrieved from `userIds`. This info is used in comments, mentions etc.
-    
+
     // const usersData = await __fetchUsersFromDB__(userIds);
     // 
     // return usersData.map((userData) => ({
     //   name: userData.name,
     //   avatar: userData.avatar.src,
     // }));
-    
+
     return [];
   },
   async resolveMentionSuggestions({ text }) {
@@ -33,14 +33,14 @@ const client = createClient({
   async resolveRoomsInfo({ roomIds }) {
     // Used only for Comments and Notifications. Return a list of room information
     // retrieved from `roomIds`.
-    
+
     // const roomsData = await __fetchRoomsFromDB__(roomIds);
     // 
     // return roomsData.map((roomData) => ({
     //   name: roomData.name,
     //   url: roomData.url,
     // }));
-    
+
     return [];
   },
 });
@@ -66,8 +66,11 @@ type Storage = {
 // provided by your own custom auth back end (if used). Useful for data that
 // will not change during a session, like a user's name or avatar.
 type UserMeta = {
-  // id?: string,  // Accessible through `user.id`
-  // info?: Json,  // Accessible through `user.info`
+  id?: string,
+  info?: {
+    name?: string;
+    avatar?: string;
+  },
 };
 
 // Optionally, the type of custom events broadcast and listened to in this
@@ -126,7 +129,7 @@ export const {
     useMarkThreadAsRead,
     useRoomNotificationSettings,
     useUpdateRoomNotificationSettings,
-  
+
     // These hooks can be exported from either context
     // useUser,
     // useRoomInfo
@@ -141,7 +144,7 @@ export const {
     useMarkAllInboxNotificationsAsRead,
     useInboxNotifications,
     useUnreadInboxNotificationsCount,
-  
+
     // These hooks can be exported from either context
     useUser,
     useRoomInfo,

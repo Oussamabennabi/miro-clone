@@ -101,14 +101,20 @@ export const getBoardById = query({
         id: v.id("boards")
     },
     handler: async (ctx, args) => {
-
         const user = await ctx.auth.getUserIdentity()
-        if (!user) {
-            throw new Error("You are not authorized!");
+        const board = await ctx.db.get(args.id)
+
+        if (!board) throw new Error("Board not found")
+
+
+        const boardWithFavoite = await ctx.db.query("favoriteBoards").withIndex("by_user_board", q =>
+            q.eq("userId", user?.subject!).eq("boardId", board?._id)).unique()
+
+        return {
+            ...board,
+            isFavorite: !!boardWithFavoite
         }
 
-        const board = await ctx.db.get(args.id)
-        return board
     }
 })
 

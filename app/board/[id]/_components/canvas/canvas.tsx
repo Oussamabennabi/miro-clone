@@ -7,7 +7,7 @@ interface CanvasProps {
 }
 const Canvas = ({ boardId }: CanvasProps) => {
   return (
-    <div className="h-full w-full max-h-screen max-w-[100vw]">
+    <div className="h-full bg-purple-100 relative w-full max-h-screen max-w-[100vw]">
       <Info boardId={boardId} />
       <ToolBar />
     </div>

@@ -6,9 +6,9 @@ import { ClientSideSuspense } from "@liveblocks/react";
 import { RoomProvider } from "@/liveblocks.config";
 import { Loader2 } from "lucide-react";
 
-export function Room({ children }: { children: ReactNode }) {
+export function Room({ children,roomId }: { children: ReactNode,roomId:string }) {
   return (
-    <RoomProvider id="my-room" initialPresence={{}}>
+    <RoomProvider id={roomId} initialPresence={{}}>
       <ClientSideSuspense
         fallback={
           <div className="w-full h-full flex items-center justify-center">
