@@ -22,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
+import succesToast from "../toasts/succes-toast";
 
 interface RenameBoardModalProps {
   board: {
@@ -44,11 +45,13 @@ const RenameBoardModal = ({ board, open, setOpen }: RenameBoardModalProps) => {
       title: board.title,
     },
   });
-  const handleDelete = async (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     await mutate({
       id: board.id,
       title: values.title,
     });
+    
+    succesToast("Board renamed successfuly");
     setOpen(false);
   };
   return (
@@ -57,7 +60,7 @@ const RenameBoardModal = ({ board, open, setOpen }: RenameBoardModalProps) => {
         Rename your board
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(handleDelete)}
+            onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-8"
           >
             <FormField

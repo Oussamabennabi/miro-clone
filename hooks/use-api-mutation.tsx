@@ -1,5 +1,4 @@
 import failedToast from "@/components/toasts/failed-toast";
-import succesToast from "@/components/toasts/succes-toast";
 import { useMutation } from "convex/react";
 import { FunctionReference } from "convex/server";
 import { useState } from "react";
@@ -16,7 +15,6 @@ export const useApiMutation = <T extends FunctionReference<"mutation">>(
 
     return apiMutate(payload)
       .then((res) => {
-        succesToast();
         return res;
       })
       .catch((err) => {

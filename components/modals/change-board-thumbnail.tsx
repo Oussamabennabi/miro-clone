@@ -16,6 +16,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import { BOARDS_IMAGES } from "@/lib/constants";
+import succesToast from "../toasts/succes-toast";
 
 interface ChangeBoardThumbnailModalProps {
   board: {
@@ -40,6 +41,8 @@ const ChangeBoardThumbnailModal = ({
       id: board.id,
       imageUrl: `/placeholders/${selectedImage}.svg`,
     });
+    
+    succesToast("Board Deleted successfuly");
     setOpen(false)
   };
   return (

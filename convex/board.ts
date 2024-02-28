@@ -1,7 +1,7 @@
 import { BOARDS_IMAGES } from "@/lib/constants";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-
+import { getAllOrThrow } from "convex-helpers/server/relationships"
 
 
 
@@ -31,24 +31,87 @@ export const createBoard = mutation({
     },
 });
 
-
-
-
 export const getBoards = query({
     args: {
-        id: v.string()
+        id: v.string(),
+        search: v.optional(v.string()),
+        favorites: v.optional(v.boolean())
     },
     handler: async (ctx, args) => {
+
         const user = await ctx.auth.getUserIdentity()
         if (!user) {
             throw new Error("You are not authorized!");
         }
-        const boards = await ctx.db
-            .query("boards").withIndex("bg_org", q => q.eq("orgId", args.id))
-            .order("desc").collect()
-        return boards;
+        const favorites = args.favorites
+        if (favorites) {
+
+            const favoritesBoard = await ctx.db.query("favoriteBoards").withIndex("by_user_org", q =>
+                q.eq("userId", user.subject).eq("orgId", args.id)
+            ).order("desc").collect()
+
+
+            const ids = favoritesBoard.map(b => b.boardId)
+
+            const boards = await getAllOrThrow(ctx.db, ids)
+
+            return boards.map(b => ({
+                ...b,
+                isFavorite: true
+            }))
+
+        }
+
+        const search = args.search?.trim()
+        let boards;
+        if (search) {
+            boards = await ctx.db.query("boards").withSearchIndex("search_title", q =>
+                q.search("title", search).eq("orgId", args.id)).collect()
+        }
+        else {
+            boards = await ctx.db
+                .query("boards").withIndex("bg_org", q => q.eq("orgId", args.id))
+                .order("desc").collect()
+
+        }
+
+
+
+        const boardsWithFavorites = boards.map(async board => {
+            const isFavoite = await ctx.db.query("favoriteBoards").withIndex("by_user_board", q =>
+                q.eq("userId", user.subject).eq("boardId", board._id)
+            ).unique()
+            return {
+                ...board,
+                isFavorite: !!isFavoite
+            }
+
+        })
+
+        const boardsWithFavoritesResult = await Promise.all(boardsWithFavorites)
+
+
+        return boardsWithFavoritesResult;
     },
 });
+
+
+export const getBoardById = query({
+    args: {
+        id: v.id("boards")
+    },
+    handler: async (ctx, args) => {
+
+        const user = await ctx.auth.getUserIdentity()
+        if (!user) {
+            throw new Error("You are not authorized!");
+        }
+
+        const board = await ctx.db.get(args.id)
+        return board
+    }
+})
+
 
 
 
@@ -62,7 +125,23 @@ export const deleteBoard = mutation({
         if (!user) {
             throw new Error("You are not authorized!");
         }
+        const board = await ctx.db.get(args.id)
+        if (!board) throw new Error("Board not found")
+        const userId = user.subject
+
+
+        const existingFavorite = await ctx.db.query("favoriteBoards").
+            withIndex("by_user_board", q =>
+                q.eq("userId", userId).
+                    eq("boardId", board._id)
+            )
+            .unique()
+
+        if (existingFavorite) {
+            await ctx.db.delete(existingFavorite._id)
+        }
         await ctx.db.delete(args.id)
+
     },
 });
 
@@ -85,19 +164,22 @@ export const updateBoard = mutation({
         const exists = await ctx.db.get(id);
         if (!exists) throw new Error("There is no board with id: " + id)
 
-        if (args.imageUrl)
+        const imageUrl = args.imageUrl?.trim()
+        const title = args.title?.trim()
+        const description = args.description?.trim()
+        if (imageUrl)
             await ctx.db.patch(id, {
-                imageUrl: args.imageUrl,
+                imageUrl,
             })
 
-        if (args.title)
+        if (title)
             await ctx.db.patch(id, {
-                title: args.title,
+                title,
             })
 
-        if (args.description)
+        if (description)
             await ctx.db.patch(id, {
-                description: args.description,
+                description,
             })
 
 
