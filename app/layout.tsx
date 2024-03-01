@@ -5,6 +5,8 @@ import "./globals.css";
 import ConvexClientProvider from "@/providers/convex-client-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { Suspense } from "react";
+import Loading from "@/components/auth/loading";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,10 +29,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Toaster toastOptions={{
-            duration:2000
-          }}/>
-          <ConvexClientProvider>{children}</ConvexClientProvider>
+          <Toaster
+            toastOptions={{
+              duration: 2000,
+            }}
+          />
+          <Suspense fallback={<Loading />}>
+            <ConvexClientProvider>{children}</ConvexClientProvider>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>
