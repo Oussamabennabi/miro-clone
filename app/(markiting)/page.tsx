@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { H1, PMuted } from "@/components/ui/typography";
 import Image from "next/image";
 
@@ -15,8 +15,8 @@ const Page = () => {
       <div className="max-w-[700px] mt-8  text-center space-y-8">
         <H1>Enter with a dream. Exit with the next big thing.</H1>
         <PMuted>
-          Build, iterate, and design faster with Miro — the visual workspace for
-          innovation.
+          Build, iterate, and design faster with Visionary Hub — the visual
+          workspace for innovation.
         </PMuted>
       </div>
     </main>
